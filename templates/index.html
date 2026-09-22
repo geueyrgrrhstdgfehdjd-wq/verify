@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket System Control Center</title>
+    <!-- Google Fonts: Kanit -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4 overflow-x-hidden relative">
+
+    <!-- 3D Canvas Background -->
+    <div id="canvas-container"></div>
+
+    <!-- Background Ambient Glow -->
+    <div class="fixed top-1/4 left-1/4 w-96 h-96 bg-cyan-600/20 rounded-full blur-[130px] pointer-events-none glow-effect"></div>
+    <div class="fixed bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[130px] pointer-events-none glow-effect" style="animation-delay: 2s;"></div>
+
+    <main class="relative z-10 w-full max-w-5xl">
+
+        <!-- STEP 1: AUTH PERMISSION -->
+        <div id="step-1" class="step-panel glass-card rounded-3xl p-8 text-center max-w-lg mx-auto">
+            <div class="w-20 h-20 bg-cyan-500/20 border border-cyan-500/40 rounded-2xl flex items-center justify-center mx-auto mb-6 text-cyan-400 text-3xl shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-ticket"></i>
+            </div>
+            
+            <h1 class="text-2xl font-bold mb-2">อนุญาตการเข้าถึงระบบ Ticket</h1>
+            <p class="text-slate-400 text-sm mb-6 font-light">ยินดีต้อนรับสู่แดชบอร์ดตั้งค่าระบบทิกเก็ต กรุณายืนยันสิทธิ์เพื่อโหลดข้อมูลเซิร์ฟเวอร์ทั้งหมดที่คุณเป็นผู้ดูแล</p>
+
+            <div class="bg-slate-900/70 rounded-xl p-4 mb-6 text-left border border-slate-800 space-y-2.5 text-xs text-slate-300">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-shield-halved text-cyan-400"></i>
+                    <span>จัดการการตั้งค่า Ticket ภายในเซิร์ฟเวอร์ของคุณ</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-server text-cyan-400"></i>
+                    <span>เข้าถึงรายชื่อเซิร์ฟเวอร์ที่บอททำงานอยู่</span>
+                </div>
+            </div>
+
+            <button onclick="goToStep(2)" class="btn-3d w-full py-3.5 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium rounded-xl flex items-center justify-center gap-3">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>อนุญาตและเข้าสู่ระบบ</span>
+            </button>
+        </div>
+
+        <!-- STEP 2: CONNECTING -->
+        <div id="step-2" class="step-panel step-hidden glass-card rounded-3xl p-10 text-center max-w-lg mx-auto">
+            <div class="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                <div class="spinner-3d absolute"></div>
+                <i class="fa-solid fa-satellite-dish text-2xl text-cyan-400"></i>
+            </div>
+
+            <h2 class="text-xl font-bold mb-2">กำลังเชื่อมต่อกับ Discord API...</h2>
+            <p class="text-slate-400 text-sm mb-6">กำลังค้นหาเซิร์ฟเวอร์ที่บอทประจำการอยู่</p>
+
+            <div class="w-full bg-slate-900/80 rounded-full h-2 overflow-hidden p-0.5 border border-slate-800">
+                <div id="progress-bar" class="bg-gradient-to-r from-cyan-500 to-purple-500 h-full rounded-full w-0 transition-all duration-300"></div>
+            </div>
+        </div>
+
+        <!-- STEP 3: CONFIRMATION -->
+        <div id="step-3" class="step-panel step-hidden glass-card rounded-3xl p-8 text-center max-w-lg mx-auto">
+            <div class="w-20 h-20 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl flex items-center justify-center mx-auto mb-6 text-emerald-400 text-3xl shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-lock-open"></i>
+            </div>
+
+            <h2 class="text-2xl font-bold mb-2">ยืนยันตัวตนสำเร็จ!</h2>
+            <p class="text-slate-400 text-sm mb-8">พบเซิร์ฟเวอร์พร้อมใช้งาน กดปุ่มด้านล่างเพื่อเข้าสู่แดชบอร์ดควบคุมระบบ</p>
+
+            <button onclick="loadDashboard()" class="btn-3d w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold rounded-xl flex items-center justify-center gap-3 text-lg">
+                <i class="fa-solid fa-sliders"></i>
+                <span>เปิดแผงควบคุมระบบทิกเก็ต</span>
+            </button>
+        </div>
+
+        <!-- STEP 4: SERVERS DASHBOARD -->
+        <div id="step-4" class="step-panel step-hidden">
+            <header class="glass-card rounded-2xl p-4 mb-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-cyan-500/20 border border-cyan-500/30 rounded-xl flex items-center justify-center text-cyan-400 text-lg">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold">Ticket System Hub</h1>
+                        <p class="text-xs text-slate-400">เลือกเซิร์ฟเวอร์เพื่อปรับแต่งระบบอย่างละเอียดยอดเยี่ยม</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-circle text-emerald-400 text-[10px]"></i> บอททำงานปกติ
+                    </span>
+                    <button onclick="location.reload()" class="p-2 text-slate-400 hover:text-white transition">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div id="servers-view">
+                <h2 class="text-md font-semibold text-slate-300 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-server text-cyan-400"></i> เซิร์ฟเวอร์ทั้งหมดที่คุณดูแลอยู่ (<span id="server-count">0</span>)
+                </h2>
+                <div id="servers-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- Server Settings View -->
+            <div id="settings-view" class="hidden">
+                <button onclick="closeSettings()" class="mb-4 text-xs bg-slate-800/80 hover:bg-slate-800 text-slate-300 px-4 py-2 rounded-xl border border-slate-700/50 flex items-center gap-2 transition">
+                    <i class="fa-solid fa-arrow-left"></i> กลับไปเลือกเซิร์ฟเวอร์
+                </button>
+
+                <div class="glass-card rounded-3xl p-6 md:p-8">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 border-b border-slate-800 gap-4 mb-6">
+                        <div class="flex items-center gap-4">
+                            <img id="active-server-icon" src="" class="w-14 h-14 rounded-2xl border border-slate-700" alt="Server">
+                            <div>
+                                <h2 id="active-server-name" class="text-xl font-bold">Server Name</h2>
+                                <p class="text-xs text-cyan-400 font-mono" id="active-server-id">ID: 000000</p>
+                            </div>
+                        </div>
+                        <button onclick="saveServerConfig()" class="btn-3d py-2.5 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium rounded-xl flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> บันทึกการตั้งค่าทั้งหมด
+                        </button>
+                    </div>
+
+                    <!-- 10+ Detailed Settings Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800">
+                            <label class="block text-xs font-medium text-slate-300 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-folder-tree text-cyan-400"></i> 1. หมวดหมู่สร้างห้องทิกเก็ต (Category Name)
+                            </label>
+                            <input type="text" id="cfg-ticket_category" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                        </div>
+
+                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800">
+                            <label class="block text-xs font-medium text-slate-300 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-user-shield text-cyan-400"></i> 2. ยศแอดมินตอบทิกเก็ต (Support Role)
+                            </label>
+                            <input type="text" id="cfg-support_role" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                        </div>
+
+                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800 md:col-span-2">
+                            <label class="block text-xs font-medium text-slate-300 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-message text-cyan-400"></i> 3. ข้อความต้อนรับอัตโนมัติ (Welcome Message)
+                            </label>
+                            <textarea id="cfg-welcome_msg" rows="2" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 transition"></textarea>
+                        </div>
+
+                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800">
+                            <label class="block text-xs font-medium text-slate-300 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-clock opacity-75 text-cyan-400"></i> 4. เวลาปิดทิกเก็ตอัตโนมัติเมื่อไม่อ่าน
+                            </label>
+                            <select id="cfg-auto_close" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                                <option value="12 ชั่วโมง">12 ชั่วโมง</option>
+                                <option value="24 ชั่วโมง">24 ชั่วโมง</option>
+                                <option value="48 ชั่วโมง">48 ชั่วโมง</option>
+                                <option value="ปิดการใช้งาน">ปิดการใช้งาน</option>
+                            </select>
+                        </div>
+
+                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800">
+                            <label class="block text-xs font-medium text-slate-300 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-hashtag text-cyan-400"></i> 5. จำนวน Ticket สูงสุด/คน
+                            </label>
+                            <input type="number" id="cfg-max_tickets" min="1" max="10" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                        </div>
+
+                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800">
+                            <label class="block text-xs font-medium text-slate-300 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-box-archive text-cyan-400"></i> 6. ช่องบันทึกประวัติ (Transcript Channel)
+                            </label>
+                            <input type="text" id="cfg-transcript_log" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                        </div>
+
+                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800">
+                            <label class="block text-xs font-medium text-slate-300 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-business-time text-cyan-400"></i> 7. ช่วงเวลาทำการของทีมงาน
+                            </label>
+                            <input type="text" id="cfg-working_hours" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                        </div>
+
+                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-medium text-slate-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-window-restore text-cyan-400"></i> 8. บังคับกรอกฟอร์ม Modal ก่อนเปิด Ticket
+                                </div>
+                                <div class="text-[11px] text-slate-500">สอบถามปัญหาก่อนสร้างห้อง</div>
+                            </div>
+                            <input type="checkbox" id="cfg-modal_form" class="w-5 h-5 accent-cyan-500 rounded cursor-pointer">
+                        </div>
+
+                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-medium text-slate-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-hand-holding-hand text-cyan-400"></i> 9. ระบบกดรับเคส (Claiming System)
+                                </div>
+                                <div class="text-[11px] text-slate-500">ให้แอดมินกด Claim ก่อนตอบ</div>
+                            </div>
+                            <input type="checkbox" id="cfg-claiming_system" class="w-5 h-5 accent-cyan-500 rounded cursor-pointer">
+                        </div>
+
+                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800 flex items-center justify-between md:col-span-2">
+                            <div>
+                                <div class="text-xs font-medium text-slate-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-star text-cyan-400"></i> 10. ให้คะแนนความประทับใจหลังปิด Ticket (Rating)
+                                </div>
+                                <div class="text-[11px] text-slate-500">ส่งแบบสอบถามให้คะแนน 5 ดาวเมื่อปิดเคส</div>
+                            </div>
+                            <input type="checkbox" id="cfg-rating_system" class="w-5 h-5 accent-cyan-500 rounded cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='js/three-bg.js') }}"></script>
+    <script>
+        let serversData = [];
+        let currentServerId = null;
+
+        function goToStep(stepNumber) {
+            document.querySelectorAll('.step-panel').forEach(panel => panel.classList.add('step-hidden'));
+            const currentStep = document.getElementById(`step-${stepNumber}`);
+            currentStep.classList.remove('step-hidden');
+
+            if (stepNumber === 2) {
+                let progress = 0;
+                const progressBar = document.getElementById('progress-bar');
+                const interval = setInterval(() => {
+                    progress += 25;
+                    progressBar.style.width = progress + '%';
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => goToStep(3), 400);
+                    }
+                }, 300);
+            }
+        }
+
+        async function loadDashboard() {
+            goToStep(4);
+            try {
+                const response = await fetch('/api/servers');
+                const data = await response.json();
+                if (data.success) {
+                    serversData = data.servers;
+                    renderServers();
+                }
+            } catch (error) {
+                console.error("Error fetching servers:", error);
+            }
+        }
+
+        function renderServers() {
+            const grid = document.getElementById('servers-grid');
+            document.getElementById('server-count').innerText = serversData.length;
+            grid.innerHTML = '';
+
+            serversData.forEach(server => {
+                const card = document.createElement('div');
+                card.className = "glass-card rounded-2xl p-5 border border-slate-800 hover:border-cyan-500/50 transition cursor-pointer flex flex-col justify-between";
+                card.onclick = () => openSettings(server.id);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <img src="${server.icon}" class="w-12 h-12 rounded-xl object-cover border border-slate-700" alt="${server.name}">
+                            <div class="min-w-0 flex-1">
+                                <h3 class="font-bold text-sm text-white truncate">${server.name}</h3>
+                                <p class="text-xs text-slate-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-users text-[10px]"></i> ${server.members.toLocaleString()} สมาชิก
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/60 rounded-xl p-3 mb-4 flex justify-between items-center text-xs border border-slate-800">
+                            <span class="text-slate-400">Ticket ที่เปิดอยู่:</span>
+                            <span class="font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">${server.active_tickets} เคส</span>
+                        </div>
+                    </div>
+                    <button class="w-full py-2 bg-slate-800 hover:bg-cyan-600 text-slate-200 hover:text-white text-xs font-medium rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-gear"></i> ตั้งค่าระบบทิกเก็ต
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openSettings(serverId) {
+            currentServerId = serverId;
+            const server = serversData.find(s => s.id === serverId);
+            if (!server) return;
+
+            document.getElementById('active-server-name').innerText = server.name;
+            document.getElementById('active-server-id').innerText = `ID: ${server.id}`;
+            document.getElementById('active-server-icon').src = server.icon;
+
+            const cfg = server.config;
+            document.getElementById('cfg-ticket_category').value = cfg.ticket_category;
+            document.getElementById('cfg-support_role').value = cfg.support_role;
+            document.getElementById('cfg-welcome_msg').value = cfg.welcome_msg;
+            document.getElementById('cfg-auto_close').value = cfg.auto_close;
+            document.getElementById('cfg-max_tickets').value = cfg.max_tickets;
+            document.getElementById('cfg-transcript_log').value = cfg.transcript_log;
+            document.getElementById('cfg-working_hours').value = cfg.working_hours;
+            document.getElementById('cfg-modal_form').checked = cfg.modal_form;
+            document.getElementById('cfg-claiming_system').checked = cfg.claiming_system;
+            document.getElementById('cfg-rating_system').checked = cfg.rating_system;
+
+            document.getElementById('servers-view').classList.add('hidden');
+            document.getElementById('settings-view').classList.remove('hidden');
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-view').classList.add('hidden');
+            document.getElementById('servers-view').classList.remove('hidden');
+        }
+
+        async function saveServerConfig() {
+            if (!currentServerId) return;
+
+            const updatedConfig = {
+                ticket_category: document.getElementById('cfg-ticket_category').value,
+                support_role: document.getElementById('cfg-support_role').value,
+                welcome_msg: document.getElementById('cfg-welcome_msg').value,
+                auto_close: document.getElementById('cfg-auto_close').value,
+                max_tickets: parseInt(document.getElementById('cfg-max_tickets').value),
+                transcript_log: document.getElementById('cfg-transcript_log').value,
+                working_hours: document.getElementById('cfg-working_hours').value,
+                modal_form: document.getElementById('cfg-modal_form').checked,
+                claiming_system: document.getElementById('cfg-claiming_system').checked,
+                rating_system: document.getElementById('cfg-rating_system').checked
+            };
+
+            const response = await fetch(`/api/server/${currentServerId}/save`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedConfig)
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        }
+    </script>
+</body>
+</html>
