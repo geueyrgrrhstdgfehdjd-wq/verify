@@ -1,0 +1,63 @@
+* {
+    font-family: 'Kanit', sans-serif;
+}
+
+#canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.glass-card {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.btn-3d {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 20px -5px rgba(6, 182, 212, 0.4);
+}
+
+.btn-3d:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 30px -5px rgba(6, 182, 212, 0.6);
+}
+
+.spinner-3d {
+    width: 70px;
+    height: 70px;
+    border: 4px solid rgba(6, 182, 212, 0.1);
+    border-left-color: #06b6d4;
+    border-right-color: #a855f7;
+    border-radius: 50%;
+    animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+.glow-effect {
+    animation: pulse-glow 4s infinite ease-in-out;
+}
+
+.step-panel {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.step-hidden {
+    display: none;
+    opacity: 0;
+}
